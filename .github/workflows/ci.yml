@@ -1,6 +1,7 @@
 name: Run backend & frontend tests + linter + docker image + push registry
 on:
   pull_request:
+    branches: [main]
 
 
 jobs:
