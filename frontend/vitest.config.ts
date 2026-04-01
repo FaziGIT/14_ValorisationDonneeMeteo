@@ -5,6 +5,11 @@ export default defineConfig({
     test: {
         globals: true,
         environment: "node",
+        coverage: {
+            provider: "v8",
+            reporter: ["json", "json-summary", "text"],
+            reportsDirectory: "./coverage",
+        },
         projects: [
             {
                 extends: true,
