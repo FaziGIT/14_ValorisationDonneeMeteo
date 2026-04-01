@@ -1,4 +1,4 @@
-name: Run backend & frontend tests
+name: Run backend & frontend tests + linter + docker image + push registry
 on:
   push:
     branches:
@@ -24,6 +24,12 @@ jobs:
           uv sync --extra dev
           cp .env.example .env
 
+      - name: Run backend linter
+        working-directory: backend
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
       - name: Start db
         working-directory: backend/timescaledb-env
         run: docker compose up -d --wait
@@ -44,6 +50,10 @@ jobs:
         run: |
           cd frontend
           npm ci --legacy-peer-deps
+
+      - name: Run frontend linter
+        working-directory: frontend
+        run: npm run check
 
       - name: Run frontend tests
         working-directory: frontend
