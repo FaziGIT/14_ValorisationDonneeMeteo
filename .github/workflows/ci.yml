@@ -1,0 +1,205 @@
+name: Run backend & frontend tests + linter + docker image + push registry
+on:
+  pull_request:
+    branches: [main]
+
+
+jobs:
+  lint-backend:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          uv sync --extra dev
+          cp .env.example .env
+
+      - name: Run backend linter
+        working-directory: backend
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+  test-backend:
+    runs-on: ubuntu-24.04
+    needs: lint-backend
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          uv sync --extra dev
+          cp .env.example .env
+
+      - name: Start db
+        working-directory: backend/timescaledb-env
+        run: docker compose up -d --wait
+
+      - name: Run backend tests
+        working-directory: backend
+        run: uv run pytest --cov --cov-report=xml --cov-report=term
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-backend
+          path: backend/coverage.xml
+
+  lint-frontend:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci --legacy-peer-deps
+
+      - name: Run frontend linter
+        working-directory: frontend
+        run: npm run check
+
+  test-frontend:
+    runs-on: ubuntu-24.04
+    needs: lint-frontend
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci --legacy-peer-deps
+
+      - name: Run frontend tests
+        working-directory: frontend
+        run: npm run test:ci
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: frontend/coverage/
+
+  test-coverage:
+    runs-on: ubuntu-24.04
+    needs: test-frontend
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage
+          path: frontend/coverage/
+
+      - name: Report Coverage
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vite-config-path: vitest.config.ts
+          json-summary-path: coverage/coverage-summary.json
+          json-final-path: coverage/coverage-final.json
+          working-directory: frontend
+
+  coverage-backend:
+    runs-on: ubuntu-24.04
+    needs: test-backend
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-backend
+          path: backend/
+
+      - name: Report Coverage
+        uses: orgoro/coverage@v3
+        with:
+          coverageFile: backend/coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  security-backend:
+    runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner (backend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: backend
+          format: sarif
+          output: trivy-backend.sarif
+          severity: CRITICAL,HIGH
+
+      - name: Upload Trivy backend results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-backend.sarif
+          category: trivy-backend
+
+  security-frontend:
+    runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner (frontend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: frontend
+          format: sarif
+          output: trivy-frontend.sarif
+          severity: CRITICAL,HIGH
+
+      - name: Upload Trivy frontend results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-frontend.sarif
+          category: trivy-frontend
