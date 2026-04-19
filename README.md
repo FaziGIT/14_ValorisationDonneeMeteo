@@ -1,5 +1,8 @@
 # Valorisation Donnée Météo
 
+[![CI](https://github.com/FaziGIT/14_ValorisationDonneeMeteo/actions/workflows/ci.yml/badge.svg)](https://github.com/FaziGIT/14_ValorisationDonneeMeteo/actions/workflows/ci.yml)
+[![Docker](https://github.com/FaziGIT/14_ValorisationDonneeMeteo/actions/workflows/docker.yml/badge.svg)](https://github.com/FaziGIT/14_ValorisationDonneeMeteo/actions/workflows/docker.yml)
+
 Projet Data For Good - Saison 14
 
 ## Structure du projet
