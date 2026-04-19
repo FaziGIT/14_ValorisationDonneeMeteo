@@ -1,4 +1,4 @@
-FROM node:24-alpine AS build
+FROM dhi.io/node:24.15.0-alpine3.23-dev AS build
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY . .
 
 RUN npm run build
 
-FROM node:24-alpine AS prod
+FROM dhi.io/node:24.15.0-alpine3.23
 
 WORKDIR /app
 
