@@ -173,7 +173,7 @@ jobs:
           format: sarif
           output: trivy-backend.sarif
           severity: CRITICAL,HIGH
-          vex: vex/project.openvex.json
+          trivy-config: vex/trivy.yaml
 
       - name: Upload Trivy backend results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
@@ -198,7 +198,7 @@ jobs:
           format: sarif
           output: trivy-frontend.sarif
           severity: CRITICAL,HIGH
-          vex: vex/project.openvex.json
+          trivy-config: vex/trivy.yaml
 
       - name: Upload Trivy frontend results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
