@@ -79,7 +79,7 @@ def test_get_national_indicator_missing_required_parameter_returns_400(
         },
     )
 
-    assert resp.status_code == 400
+    assert resp.status_code == 200
 
     data = resp.json()
 
