@@ -102,7 +102,7 @@ def test_get_national_indicator_invalid_combination_returns_400(client: APIClien
         },
     )
 
-    assert resp.status_code == 200
+    assert resp.status_code == 400
 
     data = resp.json()
 
