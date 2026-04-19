@@ -181,6 +181,22 @@ jobs:
           sarif_file: trivy-backend.sarif
           category: trivy-backend
 
+      - name: Run Trivy vulnerability scanner (backend - json)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: backend
+          format: json
+          output: trivy-backend.json
+          severity: CRITICAL,HIGH
+          trivy-config: vex/trivy.yaml
+
+      - name: Upload Trivy backend JSON report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-backend-json
+          path: trivy-backend.json
+
   security-frontend:
     runs-on: ubuntu-24.04
     permissions:
@@ -205,3 +221,19 @@ jobs:
         with:
           sarif_file: trivy-frontend.sarif
           category: trivy-frontend
+
+      - name: Run Trivy vulnerability scanner (frontend - json)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: frontend
+          format: json
+          output: trivy-frontend.json
+          severity: CRITICAL,HIGH
+          trivy-config: vex/trivy.yaml
+
+      - name: Upload Trivy frontend JSON report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-frontend-json
+          path: trivy-frontend.json
