@@ -6,7 +6,7 @@
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/FaziGIT/14_ValorisationDonneeMeteo/badge)](https://scorecard.dev/viewer/?uri=github.com/FaziGIT/14_ValorisationDonneeMeteo)
 
 
-Projet Data For Good - Saison 14
+Projet Data For Good - Saison 14 
 
 ## Structure du projet
 
