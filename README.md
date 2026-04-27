@@ -2,6 +2,9 @@
 
 [![CI](https://github.com/FaziGIT/14_ValorisationDonneeMeteo/actions/workflows/ci.yml/badge.svg)](https://github.com/FaziGIT/14_ValorisationDonneeMeteo/actions/workflows/ci.yml)
 [![Docker](https://github.com/FaziGIT/14_ValorisationDonneeMeteo/actions/workflows/docker.yml/badge.svg)](https://github.com/FaziGIT/14_ValorisationDonneeMeteo/actions/workflows/docker.yml)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12671/badge)](https://www.bestpractices.dev/projects/12671)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/fazigit/14_ValorisationDonneeMeteo/badge)](https://scorecard.dev/viewer/?uri=github.com/fazigit/14_ValorisationDonneeMeteo)
+
 
 Projet Data For Good - Saison 14
 
